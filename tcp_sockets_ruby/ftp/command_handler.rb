@@ -22,7 +22,7 @@ module FTP
         '230 Logged in anonymously'
       when 'SYST'
         '215 Unix Working With FTP'
-      when 'SWD'
+      when 'CWD'
         if File.directory?(options)
           @pwd = options
         else
