@@ -5,19 +5,19 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 
-static void do_cat(const char *path);
+static void do_cat_file(const char *path);
+static void do_cat_stdin();
 static void die(const char *s);
 
 int main (int argc, char *argv[]) {
   int i;
 
   if (argc < 2) {
-    fprintf(stderr, "%s: file name not given\n", argv[0]);
-    exit(1);
-  }
-
-  for (i=0; i < argc; i++) {
-    do_cat(argv[i]);
+    do_cat_stdin();
+  } else {
+    for (i=0; i < argc; i++) {
+      do_cat_file(argv[i]);
+    }
   }
 
   exit(0);
@@ -25,7 +25,19 @@ int main (int argc, char *argv[]) {
 
 # define BUFFER_SIZE 2048
 
-static void do_cat(const char *path) {
+static void do_cat_stdin() {
+  unsigned char buf[BUFFER_SIZE];
+  int n;
+
+  for(;;) {
+    n = read(STDIN_FILENO, buf, sizeof buf);
+    if (n < 0) exit(1);
+    if (n == 0) break;
+    if (write(STDIN_FILENO, buf, n) <0) exit(1);
+  }
+}
+
+static void do_cat_file(const char *path) {
   int fd;
   unsigned char buf[BUFFER_SIZE];
   int n;
